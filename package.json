@@ -1,0 +1,20 @@
+{
+  "name": "tramtracker",
+  "version": "1.0.0",
+  "description": "Melbourne tram departure board for digital lift screens",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "refresh-gtfs": "node scripts/refresh-gtfs.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "adm-zip": "^0.5.16",
+    "csv-parse": "^5.6.0",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "gtfs-realtime-bindings": "^2.0.0"
+  }
+}

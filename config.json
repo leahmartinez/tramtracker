@@ -1,0 +1,35 @@
+{
+  "stops": [
+    {
+      "gtfs_stop_id": "18187",
+      "label": "Spencer St (Stop 122) — towards Parliament",
+      "routes": [],
+      "max_rows": 4
+    },
+    {
+      "gtfs_stop_id": "18194",
+      "label": "Spencer St (Stop 122) — towards St Kilda",
+      "routes": [],
+      "max_rows": 4
+    },
+    {
+      "gtfs_stop_id": "43477",
+      "label": "Collins St (Stop D14) — towards La Trobe St",
+      "routes": [],
+      "max_rows": 4
+    },
+    {
+      "gtfs_stop_id": "43472",
+      "label": "Collins St (Stop D14) — towards Flinders St",
+      "routes": [],
+      "max_rows": 4
+    }
+  ],
+  "layout": "portraitA",
+  "refreshSeconds": 25,
+  "branding": {
+    "title": "Tram Departures",
+    "subtitle": "Southern Cross Station",
+    "logo": null
+  }
+}

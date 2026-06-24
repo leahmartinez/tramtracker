@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Tram Departures</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:         #ffffff;
+      --fg:         #1a1a1a;
+      --muted:      #888888;
+      --green:      #78BE20;
+      --green-pale: #f4faea;
+      --separator:  #e4e4e4;
+      --amber:      #d97706;
+      --font:       Arial, Helvetica, system-ui, sans-serif;
+
+      /* fixed board dimensions */
+      --w: 1080px;
+      --h: 1440px;
+
+      --header-h:    120px;
+      --section-h:   40px;
+      --footer-h:    48px;
+    }
+
+    html, body {
+      width: 100%; height: 100%;
+      background: #e0e0e0;
+      font-family: var(--font);
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    /* ── Board shell ─────────────────────────────────────────── */
+    #board {
+      width: var(--w);
+      height: var(--h);
+      background: var(--bg);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+
+    /* ── Header ─────────────────────────────────────────────── */
+    #header {
+      height: var(--header-h);
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 40px;
+      border-bottom: 3px solid var(--green);
+    }
+
+    #header-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    #logo {
+      height: 52px;
+      width: auto;
+      display: none;
+    }
+
+    #title {
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: var(--fg);
+      line-height: 1;
+    }
+
+    #subtitle {
+      font-size: 1rem;
+      color: var(--muted);
+      margin-top: 7px;
+      letter-spacing: 0.02em;
+    }
+
+    #clock {
+      font-size: 3rem;
+      font-weight: 300;
+      color: var(--fg);
+      letter-spacing: -0.02em;
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* ── Stop sections ───────────────────────────────────────── */
+    #rows {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* Each stop section fills an equal share of the rows area */
+    .stop-section {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+    }
+
+    .stop-section-header {
+      height: var(--section-h);
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      padding: 0 40px;
+      background: var(--green-pale);
+      border-left: 5px solid var(--green);
+      border-bottom: 1px solid var(--separator);
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #4a6e10;
+    }
+
+    /* ── Departure rows ─────────────────────────────────────── */
+    /* Rows flex-fill the remaining height within each stop section */
+    .dep-row {
+      flex: 1;
+      min-height: 0;
+      display: grid;
+      grid-template-columns: 68px 1fr auto;
+      align-items: center;
+      gap: 0 20px;
+      padding: 0 40px;
+      border-bottom: 1px solid var(--separator);
+    }
+
+    .dep-row.empty {
+      opacity: 0.35;
+    }
+
+    /* Route badge */
+    .badge {
+      width: 52px;
+      height: 52px;
+      background: var(--green);
+      color: #fff;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      flex-shrink: 0;
+    }
+
+    .dep-row.empty .badge {
+      background: var(--separator);
+    }
+
+    /* Destination */
+    .dest {
+      font-size: 1.35rem;
+      font-weight: 500;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      color: var(--fg);
+    }
+
+    /* Time + minutes group */
+    .time-group {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 2px;
+    }
+
+    .mins {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--fg);
+      white-space: nowrap;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .mins.due { color: var(--green); }
+
+    .dep-time {
+      font-size: 0.85rem;
+      color: var(--muted);
+      white-space: nowrap;
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* No data */
+    #no-data {
+      display: none;
+      flex: 1;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+      color: var(--muted);
+    }
+    #no-data.visible { display: flex; }
+
+    /* ── Footer ─────────────────────────────────────────────── */
+    #footer {
+      height: var(--footer-h);
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 40px;
+      border-top: 1px solid var(--separator);
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+
+    #updated-at.stale {
+      color: var(--amber);
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <div id="board">
+    <div id="header">
+      <div id="header-left">
+        <img id="logo" src="" alt="">
+        <div>
+          <div id="title">Tram Departures</div>
+          <div id="subtitle"></div>
+        </div>
+      </div>
+      <div id="clock"></div>
+    </div>
+
+    <div id="rows"></div>
+    <div id="no-data"><span>No upcoming trams</span></div>
+
+    <div id="footer">
+      <span id="updated-at"></span>
+      <span>PTV GTFS-RT</span>
+    </div>
+  </div>
+  <script src="board.js"></script>
+</body>
+</html>

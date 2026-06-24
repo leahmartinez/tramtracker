@@ -1,0 +1,16 @@
+{
+  "stops": [
+    {
+      "gtfs_stop_id": "19854",
+      "label": "Swanston St / Flinders St",
+      "routes": [],
+      "max_rows": 6
+    }
+  ],
+  "layout": "portraitA",
+  "refreshSeconds": 25,
+  "branding": {
+    "title": "Tram Departures",
+    "logo": null
+  }
+}
