@@ -1,0 +1,38 @@
+name: Refresh GTFS Data
+
+on:
+  schedule:
+    - cron: '0 15 * * 0'  # Every Sunday at 1am Melbourne time (UTC+10)
+  workflow_dispatch:        # Allow manual trigger from GitHub Actions tab
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - run: npm ci
+
+      - name: Refresh GTFS static data
+        run: npm run refresh-gtfs
+        env:
+          GTFS_RT_KEY: ${{ secrets.GTFS_RT_KEY }}
+          GTFS_STATIC_URL: ${{ secrets.GTFS_STATIC_URL }}
+
+      - name: Commit updated data files (if changed)
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/
+          git diff --cached --quiet && echo "No changes" || git commit -m "refresh GTFS timetable data"
+          git push
+
+      - name: Deploy to Fly.io
+        uses: superfly/flyctl-actions/setup-flyctl@master
+      - run: flyctl deploy --remote-only
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
